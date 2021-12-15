@@ -1,21 +1,30 @@
 package main
 
-import "time"
+import ("time"
+"encoding/json"
+"io"
+)
 
 //Product defines the structure of the product
 
 type Product struct {
-	ID int 
-	Name string
-	Description string
-	Price float32
-	SKU string
-	CreatedOn string
-	UpdatedOn string
-	DeletedOn string
+	ID int        `json:"id"`
+	Name string `json:"name"`
+	Description string `json:"description"`
+	Price float32 `json:"price"`
+	SKU string `json:"sku"`
+	CreatedOn string `json:"-"`
+	UpdatedOn string `json:"-"`
+	DeletedOn string `json:"-"`
+}
+type Productss []*Product
+
+func (p*Productss) ToJSON(w io.Writer) error {
+	e := json.NewEncoder(w)
+	return e.Encode(p)
 }
 
-func GetProducts()[]* Product{
+func GetProducts() Productss {
 	return productList
 }
 
