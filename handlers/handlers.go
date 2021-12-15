@@ -1,4 +1,4 @@
-package handlers
+package main
 
 import (
 	"net/http"
@@ -26,3 +26,17 @@ func (h *Handlers) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	
 		fmt.Fprintf(rw,"Hello %s",d)
 }
+// Second Handler i.e. goodbye handler
+
+type Goodbye struct {
+	l * log.Logger
+}
+func NewGoodbye(l *log.Logger) * Goodbye{
+	return &Goodbye{l}
+}
+
+func (g *Goodbye) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+
+rw.Write([]byte("Goodbye World"))}
+
+
