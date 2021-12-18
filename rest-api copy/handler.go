@@ -4,6 +4,7 @@ import ("net/http"
 "log"
 "strconv"
 "github.com/gorilla/mux"
+"context"
 )
 
 type Products struct {
@@ -27,12 +28,8 @@ func (p*Products) GetProducts (rw http.ResponseWriter, r*http.Request){
 
 func (p* Products) AddProduct (rw http.ResponseWriter, r*http.Request){
 	p.l.Println("Handle addProduct")
-	prod:= &Product{}
-	err:= prod.FromJSON(r.Body)
-	if err!=nil {
-		http.Error(rw, "Oops! Unable to unmarshal json", http.StatusBadRequest)
-	}
-	AddProduct(prod)
+	prod:=r.Context().Value(KeyProduct{}).(Product)
+	AddProduct(&prod)
 	//p.l.Printf("Prod: %#v", prod)
 
 }
@@ -45,13 +42,14 @@ func (p* Products) UpdateProducts (rw http.ResponseWriter, r*http.Request){
 		return
 	}
 	p.l.Println("Handle updateProducts",id)
-	prod:= &Product{}
-	err= prod.FromJSON(r.Body)
-	if err!=nil {
-		http.Error(rw, "Oops! Unable to unmarshal json", http.StatusBadRequest)
-	}
-	prod.ID=id
-	err=UpdateProduct(id,prod)
+	// prod:= &Product{}
+	// err= prod.FromJSON(r.Body)
+	// if err!=nil {
+	// 	http.Error(rw, "Oops! Unable to unmarshal json", http.StatusBadRequest)
+	// }
+	// prod.ID=id
+	prod:=r.Context().Value(KeyProduct{}).(Product)
+	err=UpdateProduct(id,&prod)
 	if err== ErrProductNotFound {
 		http.Error(rw, "Oops! Unable to find product", http.StatusNotFound)
 		return
@@ -61,7 +59,23 @@ func (p* Products) UpdateProducts (rw http.ResponseWriter, r*http.Request){
 		http.Error(rw, "Oops! Unable to update product", http.StatusInternalServerError)
 		return
 	}
+}
 
+type KeyProduct struct {}
 
+func (p Products) MiddlewareValidateProduct(next http.Handler) http.Handler{
+	return http.HandlerFunc(func(rw http.ResponseWriter,r *http.Request){
+	prod:= Product{}
+	err:= prod.FromJSON(r.Body)
+	if err!=nil {
+		http.Error(rw, "Oops! Unable to unmarshal json", http.StatusBadRequest)
+	}
 
+	ctx:=context.WithValue(r.Context(),KeyProduct{},prod)
+	r = r.WithContext(ctx)
+	// ctx:= r.Context().WithValue(KeyProduct{}, prod)
+	// req:=r.WithContext(ctx)
+
+	next.ServeHTTP(rw, r)
+})
 }
