@@ -49,13 +49,6 @@ func(p*Products) ServeHTTP(rw http.ResponseWriter, r*http.Request) {
 
 		// catch all for any other method then get
 	rw.WriteHeader(http.StatusMethodNotAllowed)
-	// lp:=GetProducts()
-	// //d, err:=json.Marshal(lp)
-	// err:= lp.ToJSON(rw)
-	// if err!=nil {
-	// 	http.Error(rw, "Oops! Unable to marshal json", http.StatusInternalServerError)
-	// }
-	// // rw.Write(d)
 }
 
 func (p*Products) getProducts (rw http.ResponseWriter, r*http.Request){
