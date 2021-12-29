@@ -67,7 +67,8 @@ func main() {
             // total=arr[i][1]
             }
             if flag2<1{
-                fmt.Println("TEMP TOTAL",res1,arr[res1][1],total) 
+				continue
+                // fmt.Println("TEMP TOTAL",res1,arr[res1][1],total) 
             }else{
                 break
             }
